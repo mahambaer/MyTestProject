@@ -68,7 +68,7 @@ export default class Login extends Component {
 
     render() {
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
                 <Loader loading={this.state.loading} />
                 <View style={styles.header}>
                     <Text h1>Aplikasi Sosial</Text>

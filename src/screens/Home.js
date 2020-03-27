@@ -89,7 +89,7 @@ export default class Home extends Component {
         return (
             <View style={styles.container}>
                 <Loader loading={this.state.loading} />
-                <ScrollView>
+                <ScrollView showsVerticalScrollIndicator={false}>
                     <PostCard
                         title="Judul Post Pertama Judul Post Pertama Judul Post Pertama"
                         userName="Mahambara Agung Prabawa"
