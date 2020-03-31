@@ -92,6 +92,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: "center",
         justifyContent: "space-around"
+    },
+    inputContainer: {
+        borderBottomWidth: 0
     }
 })
 

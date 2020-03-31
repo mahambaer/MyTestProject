@@ -8,13 +8,15 @@ import styles from './../assets/styles'
 import PostCard from './../components/PostCard'
 import { ScrollView } from 'react-native-gesture-handler'
 import Loader from './../components/Loader'
+import Moment from 'moment'
 
 export default class Home extends Component {
     constructor(props) {
         super(props)
     
         this.state = {
-            loading: false
+            loading: false,
+            posts: undefined
         }
     }
 
@@ -31,7 +33,7 @@ export default class Home extends Component {
                 {
                     text: "Ya",
                     onPress: async () => {
-                        this.setState({loading: true})
+                        await this.setState({loading: true})
                         const token = await AsyncStorage.getItem('@mytest:token')
                         axios({
                             url: 'http://192.168.100.15:80/myapi/public/graphql',
@@ -54,7 +56,7 @@ export default class Home extends Component {
                         }).then(async (res) => {
                             if(res.data.data){
                                 await AsyncStorage.removeItem('@mytest:token')
-                                this.setState({loadig: false})
+                                await this.setState({loadig: false})
                                 this.props.navigation.reset({
                                     index: 0,
                                     routes: [
@@ -76,6 +78,55 @@ export default class Home extends Component {
             ]
         )
     }
+
+    getData = async () => {
+        this.setState({loading: true})
+        const token = await AsyncStorage.getItem('@mytest:token')
+        axios({
+            url: 'http://192.168.100.15:80/myapi/public/graphql',
+            method: 'post',
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            data: {
+                query: `
+                    query {
+                        posts(
+                            input: {
+                                orderBy: {
+                                    field: "created_at"
+                                    order: DESC
+                                }
+                            }
+                        ) {
+                            id
+                            content
+                            createdBy {
+                                name
+                            }
+                            createdAt
+                        }
+                    }
+                `
+            }
+        }).then(res => {
+            if(res.data.data){
+                this.setState({loading: false, posts: res.data.data.posts})
+            }
+            else {
+                throw {message: "Sedang ada masalah. Coba sesaat lagi."}
+            }
+        }).catch(err => {
+            this.setState({loading: false})
+            Alert.alert("Koneksi Gagal", err.message)
+        })
+    }
+
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            this.getData()
+        })
+    }
     
     render() {
         this.props.navigation.setOptions({
@@ -90,22 +141,21 @@ export default class Home extends Component {
             <View style={styles.container}>
                 <Loader loading={this.state.loading} />
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    <PostCard
-                        title="Judul Post Pertama Judul Post Pertama Judul Post Pertama"
-                        userName="Mahambara Agung Prabawa"
-                        date="23 March 2020 on 14:40"
-                        commentNumber="5"
-                        content="Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja."
-                    />
-                    <PostCard
-                        title="Judul Post Kedua"
-                        userName="Mahambara Agung Prabawa"
-                        date="23 March 2020 on 14:40"
-                        likeNumber="99"
-                        content="Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja. Test aja."
-                    />
+                    {this.state.posts ? 
+                    this.state.posts.map(data => {
+                        return <PostCard 
+                            key={data.id}
+                            userName={data.createdBy.name}
+                            date={`${Moment(data.createdAt).format('DD MMM YYYY')} on ${Moment.utc(`${data.createdAt}-07:00`).format('HH:mm')}`}
+                            content={data.content}
+                            commentNumber={data.comments ? data.comments.length() : null}
+                            onPress={() => this.props.navigation.navigate("PostDetail")}                      
+                        />
+                    })
+                    :
+                    null}
                 </ScrollView>
-                <Icon raised name="add" reverse color="tomato" containerStyle={styles.fabContainer} />
+                <Icon raised name="add" reverse color="tomato" containerStyle={styles.fabContainer} onPress={() => this.props.navigation.navigate("PostCreate")} />
             </View>
         )
     }

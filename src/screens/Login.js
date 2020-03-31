@@ -46,22 +46,28 @@ export default class Login extends Component {
             }
         }).then(async (res) => {
             if (res.data.data) {
-                await AsyncStorage.setItem('@mytest:token', res.data.data.login)
-                this.setState({loading: false})
-                this.props.navigation.reset({
-                    index: 0,
-                    routes: [
-                        {
-                            name: "Home"
-                        }
-                    ]
-                })
+                if(res.data.data.login) {
+                    console.log(res.data.data)
+                    await AsyncStorage.setItem('@mytest:token', res.data.data.login)
+                    this.setState({loading: false})
+                    this.props.navigation.reset({
+                        index: 0,
+                        routes: [
+                            {
+                                name: "Home"
+                            }
+                        ]
+                    })
+                }
+                else {
+                    throw { message: "Periksa Email dan Password Anda" } 
+                }
             }
             else {
-                this.setState({loading: false})
                 throw { message: "Periksa Email dan Password Anda" }
             }
         }).catch(err => {
+            this.setState({loading: false})
             Alert.alert("Login Gagal", err.message)
         })
     }
