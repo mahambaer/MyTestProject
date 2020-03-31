@@ -16,7 +16,7 @@ export default class Home extends Component {
     
         this.state = {
             loading: false,
-            posts: undefined
+            posts: undefined,
         }
     }
 
@@ -33,7 +33,7 @@ export default class Home extends Component {
                 {
                     text: "Ya",
                     onPress: async () => {
-                        await this.setState({loading: true})
+                        this.setState({loading: true})
                         const token = await AsyncStorage.getItem('@mytest:token')
                         axios({
                             url: 'http://192.168.100.15:80/myapi/public/graphql',
@@ -56,7 +56,7 @@ export default class Home extends Component {
                         }).then(async (res) => {
                             if(res.data.data){
                                 await AsyncStorage.removeItem('@mytest:token')
-                                await this.setState({loadig: false})
+                                this.setState({loadig: false})
                                 this.props.navigation.reset({
                                     index: 0,
                                     routes: [
