@@ -95,6 +95,14 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         borderBottomWidth: 0
+    },
+    iconContainer: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        width: 75
+    },
+    iconStyle: {
+        marginHorizontal: 16
     }
 })
 

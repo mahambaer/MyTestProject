@@ -146,10 +146,10 @@ export default class Home extends Component {
                         return <PostCard 
                             key={data.id}
                             userName={data.createdBy.name}
-                            date={`${Moment(data.createdAt).format('DD MMM YYYY')} on ${Moment.utc(`${data.createdAt}-07:00`).format('HH:mm')}`}
+                            date={`${Moment(data.createdAt).format('DD MMM YYYY')} on ${Moment(data.createdAt).format('HH:mm')}`}
                             content={data.content}
                             commentNumber={data.comments ? data.comments.length() : null}
-                            onPress={() => this.props.navigation.navigate("PostDetail")}                      
+                            onPress={() => this.props.navigation.navigate("PostDetail", {id: data.id})}                      
                         />
                     })
                     :
